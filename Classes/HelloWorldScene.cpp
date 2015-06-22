@@ -78,8 +78,21 @@ bool HelloWorld::init()
     eventListener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
     Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(eventListener, this);
     
+    // Invisible node to prevent event listener
+    auto invisibleNode = Node::create();
+    this->addChild(invisibleNode, 999);
+    auto preventEventListener = EventListenerTouchOneByOne::create();
+    preventEventListener->onTouchBegan = [](Touch* touch, Event* event) {
+        log("!!! Prevent Event Listener !!!");
+        return true;
+    };
+    preventEventListener->setSwallowTouches(true);
+    preventEventListener->setEnabled(false);
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(preventEventListener, invisibleNode);
+    
     // Set Properties
     this->setSprite(sprite);
+    this->setPreventEventListener(preventEventListener);
     
     return true;
 }
@@ -102,6 +115,7 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 HelloWorld::HelloWorld()
 : _rightFlg(true)
 , _sprite(nullptr)
+, _preventEventListener(nullptr)
 {
     
 }
@@ -109,6 +123,7 @@ HelloWorld::HelloWorld()
 HelloWorld::~HelloWorld()
 {
     CC_SAFE_RELEASE_NULL(_sprite);
+    CC_SAFE_RELEASE_NULL(_preventEventListener);
 }
 
 bool HelloWorld::onTouchBegan(Touch* touch, Event* event)
@@ -121,11 +136,24 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event)
     log("=== Call HelloWorld::onTouchEnded() ===");
     
     // Create Action
+    auto eventListenerDisable = CallFunc::create([&]() {
+        log("eventListenerDisable()");
+        this->getPreventEventListener()->setEnabled(true);
+    });
+    
+    auto eventListenerEnable = CallFunc::create([&]() {
+        log("eventListenerEnable()");
+        this->getPreventEventListener()->setEnabled(false);
+    });
+
     float deltaAngle = this->getRightFlg() ? 180.0f : -180.0f;
     auto rotateBy = RotateBy::create(2.0f, deltaAngle);
     
     // Run Action
-    this->getSprite()->runAction(rotateBy);
+    this->getSprite()->runAction(Sequence::create(eventListenerDisable,
+                                                  rotateBy,
+                                                  eventListenerEnable,
+                                                  nullptr));
     
     // Set RightFlg
     this->setRightFlg(!this->getRightFlg());

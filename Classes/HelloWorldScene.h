@@ -29,6 +29,7 @@ public:
     // Properties
     CC_SYNTHESIZE(bool, _rightFlg, RightFlg);
     CC_SYNTHESIZE_RETAIN(cocos2d::Sprite*, _sprite, Sprite);
+    CC_SYNTHESIZE_RETAIN(cocos2d::EventListener*, _preventEventListener, PreventEventListener);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
