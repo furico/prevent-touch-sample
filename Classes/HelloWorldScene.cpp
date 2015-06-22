@@ -80,6 +80,7 @@ bool HelloWorld::init()
     
     // Set Properties
     this->setSprite(sprite);
+    this->setEventListener(eventListener);
     
     return true;
 }
@@ -102,6 +103,7 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 HelloWorld::HelloWorld()
 : _rightFlg(true)
 , _sprite(nullptr)
+, _eventListener(nullptr)
 {
     
 }
@@ -121,11 +123,24 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event)
     log("=== Call HelloWorld::onTouchEnded() ===");
     
     // Create Action
+    auto eventListenerDisable = CallFunc::create([&]() {
+        log("eventListenerDisable()");
+        this->getEventListener()->setEnabled(false);
+    });
+    
+    auto eventListenerEnable = CallFunc::create([&]() {
+        log("eventListenerEnable()");
+        this->getEventListener()->setEnabled(true);
+    });
+    
     float deltaAngle = this->getRightFlg() ? 180.0f : -180.0f;
     auto rotateBy = RotateBy::create(2.0f, deltaAngle);
     
     // Run Action
-    this->getSprite()->runAction(rotateBy);
+    this->getSprite()->runAction(Sequence::create(eventListenerDisable,
+                                                  rotateBy,
+                                                  eventListenerEnable,
+                                                  nullptr));
     
     // Set RightFlg
     this->setRightFlg(!this->getRightFlg());
