@@ -111,6 +111,7 @@ HelloWorld::HelloWorld()
 HelloWorld::~HelloWorld()
 {
     CC_SAFE_RELEASE_NULL(_sprite);
+    CC_SAFE_RELEASE_NULL(_eventListener);
 }
 
 bool HelloWorld::onTouchBegan(Touch* touch, Event* event)
