@@ -72,6 +72,15 @@ bool HelloWorld::init()
     // add the sprite as a child to this layer
     this->addChild(sprite, 0);
     
+    // Event Listener
+    auto eventListener = EventListenerTouchOneByOne::create();
+    eventListener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
+    eventListener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(eventListener, this);
+    
+    // Set Properties
+    this->setSprite(sprite);
+    
     return true;
 }
 
@@ -88,4 +97,36 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif
+}
+
+HelloWorld::HelloWorld()
+: _rightFlg(true)
+, _sprite(nullptr)
+{
+    
+}
+
+HelloWorld::~HelloWorld()
+{
+    CC_SAFE_RELEASE_NULL(_sprite);
+}
+
+bool HelloWorld::onTouchBegan(Touch* touch, Event* event)
+{
+    return true;
+}
+
+void HelloWorld::onTouchEnded(Touch* touch, Event* event)
+{
+    log("=== Call HelloWorld::onTouchEnded() ===");
+    
+    // Create Action
+    float deltaAngle = this->getRightFlg() ? 180.0f : -180.0f;
+    auto rotateBy = RotateBy::create(2.0f, deltaAngle);
+    
+    // Run Action
+    this->getSprite()->runAction(rotateBy);
+    
+    // Set RightFlg
+    this->setRightFlg(!this->getRightFlg());
 }

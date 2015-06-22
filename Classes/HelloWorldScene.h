@@ -17,6 +17,18 @@ public:
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
+    
+    // Constructor and Destructor
+    HelloWorld();
+    virtual ~HelloWorld();
+    
+    // Callback functions
+    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event) override;
+    void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event) override;
+    
+    // Properties
+    CC_SYNTHESIZE(bool, _rightFlg, RightFlg);
+    CC_SYNTHESIZE_RETAIN(cocos2d::Sprite*, _sprite, Sprite);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
